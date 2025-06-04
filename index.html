@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بازی مافیا آنلاین | Mafia Game PWA</title>
+  
+  <meta name="description" content="بازی هیجان‌انگیز و گروهی مافیا به صورت آفلاین، بدون نیاز به نصب، مناسب برای موبایل و تحت وب. طراحی شده توسط محمد دارستانی.">
+  <meta name="keywords" content="بازی مافیا, mafia game, بازی گروهی, PWA, بدون نصب, بازی تحت وب, بازی موبایل, بازی آنلاین مافیا, mafia online">
+  <meta name="author" content="Mohammad Darestani">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="icon" href="/favicon.ico">
+
+  <!-- سوشال تگ‌ها برای به اشتراک‌گذاری بهتر -->
+  <meta property="og:title" content="بازی مافیا آنلاین | Mafia Game PWA">
+  <meta property="og:description" content="بدون نیاز به نصب، با طراحی جذاب و مناسب بازی گروهی مافیا برای موبایل.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://نام‌سایتت.netlify.app">
+  <meta property="og:image" content="https://نام‌سایتت.netlify.app/preview.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cardo:wght@700&display=swap');
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background: 
+                radial-gradient(circle, rgba(0,0,0,0.8) 0%, #000 100%),
+                url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="black"/><path d="M0 50L100 50M50 0L50 100" stroke="rgba(50,0,0,0.3)" stroke-width="1"/></svg>');
+            color: #c1121f;
+            font-family: 'Cardo', serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .title {
+            font-size: 4.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: 5px;
+            text-shadow: 
+                0 0 5px #c1121f,
+                0 0 15px rgba(193, 18, 31, 0.5);
+            position: relative;
+        }
+
+        .title::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #c1121f, transparent);
+            animation: pulse 3s infinite;
+        }
+
+        .subtitle {
+            font-size: 2rem;
+            margin-bottom: 4rem;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.7);
+        }
+
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #c1121f;
+            padding: 12px 35px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 200px;
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            background: rgba(193, 18, 31, 0.2);
+            box-shadow: 0 0 10px rgba(193, 18, 31, 0.5);
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(193, 18, 31, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* افکت نویز تصادفی برای حس گرین قدیمی */
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="1" stitchTiles="stitch"/><feColorMatrix type="matrix" values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.1 0"/></filter><rect width="100%" height="100%" filter="url(%23noise)"/></svg>');
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: -1;
+        }
+
+        /* امضای طراحی */
+        .design-credit {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: rgba(255,255,255,0.3);
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">MAFIA</div>
+    <div class="subtitle">GAME</div>
+    
+    <div class="btn-container">
+        <button class="btn" id="playBtn">PLAY</button>
+        <button class="btn" id="playersBtn">PLAYERS</button>
+    </div>
+
+    <div class="design-credit">designed by mohamad darestani</div>
+
+    <script>
+        // افکت تایپوگرافی برای عنوان (حس قدیمی)
+        const title = document.querySelector('.title');
+        let originalText = title.innerText;
+        title.innerHTML = originalText.split('').map(char => 
+            `<span style="opacity:0;animation:fadeIn 0.5s ${Math.random()*0.5}s forwards">${char}</span>`
+        ).join('');
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                to { opacity:1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // صداگذاری دکمه‌ها
+        const buttons = document.querySelectorAll('.btn');
+        const clickSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU...'); // صدای کلیک کوتاه
+
+            buttons.forEach(btn => {
+        btn.addEventListener('mouseenter', () => {
+            btn.style.transform = 'translateY(-2px)';
+        });
+        
+        btn.addEventListener('mouseleave', () => {
+            btn.style.transform = '';
+        });
+        
+        btn.addEventListener('click', (e) => {
+            clickSound.play();
+            
+            if(e.target.id === 'playBtn') {
+                // تغییر مسیر به صفحه mafia-roles.html
+                window.location.href = 'mafia-roles.html';
+                return;
+            }
+            
+            // تغییرات جدید برای اتصال به صفحه بازیکنان
+            if(e.target.id === 'playersBtn') {
+                // ایجاد یک iframe برای نمایش صفحه بازیکنان
+                const playerFrame = document.createElement('div');
+                playerFrame.style.position = 'fixed';
+                playerFrame.style.top = '0';
+                playerFrame.style.left = '0';
+                playerFrame.style.width = '100%';
+                playerFrame.style.height = '100%';
+                playerFrame.style.backgroundColor = 'rgba(0,0,0,0.9)';
+                playerFrame.style.zIndex = '1000';
+                playerFrame.innerHTML = `
+                    <iframe src="players.html" style="width:100%;height:100%;border:none;"></iframe>
+                    <button onclick="this.parentNode.remove()" style="position:absolute;top:20px;left:20px;background:#c1121f;color:white;border:none;padding:10px;cursor:pointer;">✕</button>
+                `;
+                document.body.appendChild(playerFrame);
+            }
+        });
+    });
+
+        // تابع برای بازگشت از صفحه بازیکنان
+        window.closePlayerPage = function() {
+            const frame = document.querySelector('div[style*="position: fixed;"]');
+            if(frame) frame.remove();
+        };
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful');
+        })
+        .catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+    });
+  }
+</script>
+</body>
+</html>

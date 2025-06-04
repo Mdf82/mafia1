@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mafia Game - Role Setup</title>
+    <style>
+        :root {
+            --citizen-color: #3498db;
+            --mafia-color: #e74c3c;
+            --neutral-color: #f39c12;
+            --dark-bg: #2c3e50;
+            --light-text: #ecf0f1;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 20px 0 40px;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--light-text);
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--citizen-color), var(--mafia-color), var(--neutral-color));
+            margin: 10px auto;
+            border-radius: 3px;
+        }
+        
+        .role-sections {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+        
+        .role-section {
+            flex: 1;
+            min-width: 300px;
+            max-width: 400px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+        
+        .role-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .citizen {
+            border-top: 5px solid var(--citizen-color);
+        }
+        
+        .mafia {
+            border-top: 5px solid var(--mafia-color);
+        }
+        
+        .neutral {
+            border-top: 5px solid var(--neutral-color);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .citizen .section-title {
+            color: var(--citizen-color);
+        }
+        
+        .mafia .section-title {
+            color: var(--mafia-color);
+        }
+        
+        .neutral .section-title {
+            color: var(--neutral-color);
+        }
+        
+        .add-role {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .add-role input {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: var(--light-text);
+            font-size: 1rem;
+        }
+        
+        .add-role input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .add-role button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+        
+        .citizen .add-role button {
+            background-color: var(--citizen-color);
+            color: white;
+        }
+        
+        .mafia .add-role button {
+            background-color: var(--mafia-color);
+            color: white;
+        }
+        
+        .neutral .add-role button {
+            background-color: var(--neutral-color);
+            color: white;
+        }
+        
+        .add-role button:hover {
+            opacity: 0.9;
+        }
+        
+        .roles-list {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .roles-list::-webkit-scrollbar {
+            width: 5px;
+        }
+        
+        .roles-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+        
+        .roles-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+        }
+        
+        .role-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            transition: var(--transition);
+        }
+        
+        .role-item:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .role-item span {
+            flex: 1;
+        }
+        
+        .role-item button {
+            background: none;
+            border: none;
+            color: #ff4d4d;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: var(--transition);
+        }
+        
+        .role-item button:hover {
+            transform: scale(1.2);
+        }
+        
+        .summary {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+        
+        .summary h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .total-roles {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--light-text);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn-primary {
+            background-color: var(--citizen-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background-color: var(--mafia-color);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        @media (max-width: 768px) {
+            .role-sections {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .role-section {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Role Setup</h1>
+        
+        <div class="role-sections">
+            <!-- Citizen Roles -->
+            <div class="role-section citizen">
+                <div class="section-header">
+                    <h2 class="section-title">Citizen</h2>
+                    <span class="role-count" id="citizen-count">0</span>
+                </div>
+                
+                <div class="add-role">
+                    <input type="text" id="citizen-role-input" placeholder="Add new citizen role">
+                    <button id="add-citizen-btn">Add</button>
+                </div>
+                
+                <ul class="roles-list" id="citizen-roles-list">
+                    <!-- Roles will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <!-- Mafia Roles -->
+            <div class="role-section mafia">
+                <div class="section-header">
+                    <h2 class="section-title">Mafia</h2>
+                    <span class="role-count" id="mafia-count">0</span>
+                </div>
+                
+                <div class="add-role">
+                    <input type="text" id="mafia-role-input" placeholder="Add new mafia role">
+                    <button id="add-mafia-btn">Add</button>
+                </div>
+                
+                <ul class="roles-list" id="mafia-roles-list">
+                    <!-- Roles will be added here dynamically -->
+                </ul>
+            </div>
+            
+            <!-- Neutral Roles -->
+            <div class="role-section neutral">
+                <div class="section-header">
+                    <h2 class="section-title">Neutral</h2>
+                    <span class="role-count" id="neutral-count">0</span>
+                </div>
+                
+                <div class="add-role">
+                    <input type="text" id="neutral-role-input" placeholder="Add new neutral role">
+                    <button id="add-neutral-btn">Add</button>
+                </div>
+                
+                <ul class="roles-list" id="neutral-roles-list">
+                    <!-- Roles will be added here dynamically -->
+                </ul>
+            </div>
+        </div>
+        
+        <div class="summary">
+            <h2>Total Roles Added</h2>
+            <div class="total-roles" id="total-roles">0</div>
+        </div>
+        
+        <div class="actions">
+            <button class="btn btn-primary" id="save-btn">Save Roles</button>
+            <button class="btn btn-danger" id="reset-btn">Reset All</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const citizenInput = document.getElementById('citizen-role-input');
+        const mafiaInput = document.getElementById('mafia-role-input');
+        const neutralInput = document.getElementById('neutral-role-input');
+        const addCitizenBtn = document.getElementById('add-citizen-btn');
+        const addMafiaBtn = document.getElementById('add-mafia-btn');
+        const addNeutralBtn = document.getElementById('add-neutral-btn');
+        const citizenList = document.getElementById('citizen-roles-list');
+        const mafiaList = document.getElementById('mafia-roles-list');
+        const neutralList = document.getElementById('neutral-roles-list');
+        const citizenCount = document.getElementById('citizen-count');
+        const mafiaCount = document.getElementById('mafia-count');
+        const neutralCount = document.getElementById('neutral-count');
+        const totalRoles = document.getElementById('total-roles');
+        const saveBtn = document.getElementById('save-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        // Role Arrays
+        let citizenRoles = [];
+        let mafiaRoles = [];
+        let neutralRoles = [];
+        
+        // Initialize from localStorage if available
+        function loadRoles() {
+            const savedRoles = localStorage.getItem('mafiaGameRoles');
+            if (savedRoles) {
+                const roles = JSON.parse(savedRoles);
+                citizenRoles = roles.citizen || [];
+                mafiaRoles = roles.mafia || [];
+                neutralRoles = roles.neutral || [];
+                updateAllLists();
+            }
+        }
+        
+        // Save roles to localStorage
+        function saveRoles() {
+            const roles = {
+                citizen: citizenRoles,
+                mafia: mafiaRoles,
+                neutral: neutralRoles
+            };
+            localStorage.setItem('mafiaGameRoles', JSON.stringify(roles));
+            alert('Roles saved successfully!');
+        }
+        
+        // Reset all roles
+        function resetRoles() {
+            if (confirm('Are you sure you want to reset all roles?')) {
+                citizenRoles = [];
+                mafiaRoles = [];
+                neutralRoles = [];
+                updateAllLists();
+                localStorage.removeItem('mafiaGameRoles');
+            }
+        }
+        
+        // Update all role lists and counts
+        function updateAllLists() {
+            updateRoleList(citizenList, citizenRoles, citizenCount);
+            updateRoleList(mafiaList, mafiaRoles, mafiaCount);
+            updateRoleList(neutralList, neutralRoles, neutralCount);
+            updateTotalCount();
+        }
+        
+        // Update a single role list
+        function updateRoleList(listElement, roles, countElement) {
+            listElement.innerHTML = '';
+            roles.forEach((role, index) => {
+                const li = document.createElement('li');
+                li.className = 'role-item';
+                li.innerHTML = `
+                    <span>${role}</span>
+                    <button class="delete-role" data-index="${index}">&times;</button>
+                `;
+                listElement.appendChild(li);
+            });
+            countElement.textContent = roles.length;
+            
+            // Add event listeners to delete buttons
+            const deleteButtons = listElement.querySelectorAll('.delete-role');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.getAttribute('data-index'));
+                    if (listElement === citizenList) {
+                        citizenRoles.splice(index, 1);
+                    } else if (listElement === mafiaList) {
+                        mafiaRoles.splice(index, 1);
+                    } else {
+                        neutralRoles.splice(index, 1);
+                    }
+                    updateAllLists();
+                });
+            });
+        }
+        
+        // Update total roles count
+        function updateTotalCount() {
+            const total = citizenRoles.length + mafiaRoles.length + neutralRoles.length;
+            totalRoles.textContent = total;
+        }
+        
+        // Add a new role
+        function addRole(type) {
+            let input, roles;
+            if (type === 'citizen') {
+                input = citizenInput;
+                roles = citizenRoles;
+            } else if (type === 'mafia') {
+                input = mafiaInput;
+                roles = mafiaRoles;
+            } else {
+                input = neutralInput;
+                roles = neutralRoles;
+            }
+            
+            const roleName = input.value.trim();
+            if (roleName) {
+                roles.push(roleName);
+                input.value = '';
+                updateAllLists();
+            }
+        }
+        
+        // Event Listeners
+        addCitizenBtn.addEventListener('click', () => addRole('citizen'));
+        addMafiaBtn.addEventListener('click', () => addRole('mafia'));
+        addNeutralBtn.addEventListener('click', () => addRole('neutral'));
+        
+        // Allow adding roles with Enter key
+        citizenInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addRole('citizen');
+        });
+        
+        mafiaInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addRole('mafia');
+        });
+        
+        neutralInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addRole('neutral');
+        });
+        
+        saveBtn.addEventListener('click', saveRoles);
+        resetBtn.addEventListener('click', resetRoles);
+        
+        // Initialize
+        loadRoles();
+    </script>
+</body>
+</html>
