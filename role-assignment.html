@@ -211,6 +211,7 @@
             justify-content: center;
             margin-top: 40px;
             gap: 20px;
+            flex-wrap: wrap;
         }
         
         .btn {
@@ -223,10 +224,16 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             font-family: 'Cinzel Decorative', cursive;
+            min-width: 180px;
         }
         
         .btn-primary {
             background-color: var(--gold);
+            color: black;
+        }
+        
+        .btn-secondary {
+            background-color: var(--silver);
             color: black;
         }
         
@@ -240,6 +247,91 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
+        /* Report Modal */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .report-content {
+            background-color: var(--darker-bg);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        
+        .report-title {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 1px solid var(--gold);
+            padding-bottom: 10px;
+        }
+        
+        .report-list {
+            list-style-type: none;
+        }
+        
+        .report-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: 'MedievalSharp', cursive;
+        }
+        
+        .report-item:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .report-player {
+            color: var(--silver);
+        }
+        
+        .report-role {
+            font-weight: bold;
+        }
+        
+        .citizen-role {
+            color: var(--citizen-blue);
+        }
+        
+        .mafia-role {
+            color: var(--mafia-red);
+        }
+        
+        .neutral-role {
+            color: var(--neutral-orange);
+        }
+        
+        .close-report {
+            background-color: var(--blood-red);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            font-family: 'Cinzel Decorative', cursive;
+        }
+        
         @media (max-width: 768px) {
             .players-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -251,6 +343,12 @@
             
             .role-title {
                 font-size: 1.5rem;
+            }
+            
+            .btn {
+                min-width: 150px;
+                padding: 10px 15px;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -280,16 +378,30 @@
         
         <div class="actions">
             <button class="btn btn-primary" id="assign-btn">Assign Roles</button>
+            <button class="btn btn-secondary" id="report-btn">Generate Report</button>
+            <button class="btn btn-secondary" id="day-one-btn">Day One</button>
             <button class="btn btn-danger" id="reset-btn">Reset All</button>
         </div>
     </div>
     
+    <!-- Role Reveal Overlay -->
     <div class="role-overlay" id="role-overlay">
         <div class="role-icon" id="role-icon">🕵️</div>
         <h2 class="role-title" id="role-title">Your Role</h2>
         <div class="role-type" id="role-type">Citizen</div>
         <div class="role-description" id="role-description"></div>
         <button class="confirm-btn" id="confirm-btn">I Understand</button>
+    </div>
+    
+    <!-- Report Modal -->
+    <div class="report-modal" id="report-modal">
+        <div class="report-content">
+            <h2 class="report-title">Game Report</h2>
+            <ul class="report-list" id="report-list">
+                <!-- Report items will be added here -->
+            </ul>
+            <button class="close-report" id="close-report">Close</button>
+        </div>
     </div>
 
     <script>
@@ -299,6 +411,8 @@
         const totalRolesEl = document.getElementById('total-roles');
         const remainingRolesEl = document.getElementById('remaining-roles');
         const assignBtn = document.getElementById('assign-btn');
+        const reportBtn = document.getElementById('report-btn');
+        const dayOneBtn = document.getElementById('day-one-btn');
         const resetBtn = document.getElementById('reset-btn');
         const roleOverlay = document.getElementById('role-overlay');
         const confirmBtn = document.getElementById('confirm-btn');
@@ -307,6 +421,9 @@
         const roleDescriptionEl = document.getElementById('role-description');
         const roleIconEl = document.getElementById('role-icon');
         const mainContainer = document.getElementById('main-container');
+        const reportModal = document.getElementById('report-modal');
+        const reportList = document.getElementById('report-list');
+        const closeReportBtn = document.getElementById('close-report');
         
         // Game Data
         let players = [];
@@ -382,6 +499,11 @@
             
             // Update assign button state
             assignBtn.disabled = Object.keys(assignedRoles).length > 0;
+            
+            // Update report and day one buttons
+            const allRolesAssigned = Object.keys(assignedRoles).length === roles.length && roles.length > 0;
+            reportBtn.disabled = !allRolesAssigned;
+            dayOneBtn.disabled = !allRolesAssigned;
         }
         
         // Assign roles randomly to players
@@ -494,6 +616,43 @@
             updateUI();
         }
         
+        // Generate and show report
+        function generateReport() {
+            reportList.innerHTML = '';
+            
+            players.forEach(player => {
+                if (assignedRoles[player.id]) {
+                    const role = assignedRoles[player.id];
+                    const reportItem = document.createElement('li');
+                    reportItem.className = 'report-item';
+                    
+                    const roleClass = `${role.type.toLowerCase()}-role`;
+                    
+                    reportItem.innerHTML = `
+                        <span class="report-player">${player.name}</span>
+                        <span class="report-role ${roleClass}">${role.name} (${role.type})</span>
+                    `;
+                    
+                    reportList.appendChild(reportItem);
+                }
+            });
+            
+            reportModal.style.display = 'flex';
+        }
+        
+        // Go to Day One (placeholder - you'll need to implement this page)
+        function goToDayOne() {
+            // Save game state first
+            localStorage.setItem('mafiaGameState', JSON.stringify({
+                players: players,
+                assignedRoles: assignedRoles,
+                phase: 'day-one'
+            }));
+            
+            // Redirect to day one page
+            window.location.href = 'day-one.html';
+        }
+        
         // Reset all assignments
         function resetAssignments() {
             if (confirm('Are you sure you want to reset all role assignments?')) {
@@ -506,15 +665,20 @@
         
         // Event Listeners
         assignBtn.addEventListener('click', assignRoles);
+        reportBtn.addEventListener('click', generateReport);
+        dayOneBtn.addEventListener('click', goToDayOne);
         resetBtn.addEventListener('click', resetAssignments);
         confirmBtn.addEventListener('click', confirmRole);
+        closeReportBtn.addEventListener('click', () => {
+            reportModal.style.display = 'none';
+        });
         
-        // Close overlay when clicking outside (disabled for security)
-        // roleOverlay.addEventListener('click', (e) => {
-        //     if (e.target === roleOverlay) {
-        //         confirmRole();
-        //     }
-        // });
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === reportModal) {
+                reportModal.style.display = 'none';
+            }
+        });
         
         // Initialize
         document.addEventListener('DOMContentLoaded', loadData);
