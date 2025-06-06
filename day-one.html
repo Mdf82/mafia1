@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>روز اول - بازی مافیا</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
+        
+        :root {
+            --dark-bg: #0a0a12;
+            --darker-bg: #05050a;
+            --blood-red: #8b0000;
+            --gold: #d4af37;
+            --silver: #c0c0c0;
+            --citizen-blue: #1e90ff;
+            --mafia-red: #b22222;
+            --neutral-orange: #ff8c00;
+            --player-blue: #4169e1;
+            --warning-orange: #ffa500;
+            --dead-gray: #808080;
+            --table-brown: #8B4513;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Scheherazade New', serif;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(139, 0, 0, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 80% 70%, rgba(30, 144, 255, 0.1) 0%, transparent 30%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            padding-bottom: 100px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin: 20px 0 40px;
+            font-size: 2.5rem;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            position: relative;
+        }
+        
+        h1::after {
+            content: '';
+            display: block;
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(to left, transparent, var(--gold), transparent);
+            margin: 15px auto;
+        }
+        
+        .table {
+            width: 80%;
+            height: 400px;
+            background-color: var(--table-brown);
+            margin: 0 auto;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 10px solid #5D4037;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .table-center {
+            width: 60%;
+            height: 60%;
+            background-color: #5D4037;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .center-card {
+            width: 120px;
+            height: 80px;
+            background-color: var(--darker-bg);
+            border: 2px solid var(--gold);
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .center-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+        }
+        
+        .center-card.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: var(--dead-gray);
+        }
+        
+        .seats-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .seat {
+            position: absolute;
+            width: 120px;
+            height: 60px;
+            background-color: var(--darker-bg);
+            border: 2px solid var(--player-blue);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .seat.warning {
+            border-color: var(--warning-orange);
+            background-color: rgba(255, 165, 0, 0.1);
+        }
+        
+        .seat.danger {
+            border-color: var(--blood-red);
+            background-color: rgba(139, 0, 0, 0.2);
+        }
+        
+        .seat.dead {
+            border-color: var(--dead-gray);
+            background-color: rgba(128, 128, 128, 0.3);
+            cursor: not-allowed;
+        }
+        
+        .player-select {
+            width: 100%;
+            padding: 5px;
+            background-color: var(--dark-bg);
+            color: white;
+            border: 1px solid var(--gold);
+            border-radius: 4px;
+            text-align: center;
+            font-family: inherit;
+        }
+        
+        .player-name {
+            font-weight: bold;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .seat.assigned .player-name {
+            display: block;
+        }
+        
+        .seat.assigned .player-select {
+            display: none;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--gold);
+            color: black;
+        }
+        
+        .btn-danger {
+            background-color: var(--blood-red);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .player-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--darker-bg);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            border: 2px solid var(--gold);
+            position: relative;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: none;
+            border: none;
+            color: var(--silver);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--gold);
+            font-size: 1.5rem;
+        }
+        
+        .role-info {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: rgba(212, 175, 55, 0.1);
+        }
+        
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            font-weight: bold;
+        }
+        
+        .main-speech {
+            background-color: var(--citizen-blue);
+            color: white;
+        }
+        
+        .challenge {
+            background-color: var(--neutral-orange);
+            color: black;
+        }
+        
+        .warning-btn {
+            background-color: var(--warning-orange);
+            color: black;
+        }
+        
+        .kill-btn {
+            background-color: var(--blood-red);
+            color: white;
+        }
+        
+        .revive-btn {
+            background-color: var(--citizen-blue);
+            color: white;
+        }
+        
+        .timer {
+            font-size: 0.9rem;
+            text-align: right;
+            margin-top: 5px;
+            color: var(--silver);
+        }
+        
+        .disabled-btn {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .next-day-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 30px;
+            background-color: var(--gold);
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .table {
+                width: 95%;
+                height: 300px;
+            }
+            
+            .seat {
+                width: 80px;
+                height: 50px;
+                font-size: 0.8rem;
+            }
+            
+            .center-card {
+                width: 80px;
+                height: 60px;
+                font-size: 0.7rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>روز اول - بازی مافیا</h1>
+        
+        <div class="table">
+            <div class="table-center">
+                <div class="center-card" data-card="change-face">تغییر چهره</div>
+                <div class="center-card" data-card="silence">سکوت بره‌ها</div>
+                <div class="center-card" data-card="handcuff">دستبند</div>
+                <div class="center-card" data-card="beautiful-mind">ذهن زیبا</div>
+            </div>
+            
+            <div class="seats-container" id="seats-container">
+                <!-- صندلی‌ها به صورت داینامیک ایجاد می‌شوند -->
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="confirm-seats-btn">تایید جایگاه‌ها</button>
+            <button class="btn btn-danger" id="reset-seats-btn">بازنشانی جایگاه‌ها</button>
+        </div>
+        
+        <button class="next-day-btn" id="next-day-btn" disabled>روز بعد</button>
+    </div>
+    
+    <div class="player-modal" id="player-modal">
+        <div class="modal-content">
+            <button class="close-modal" id="close-modal">&times;</button>
+            <h2 class="modal-title" id="modal-title">مدیریت بازیکن</h2>
+            
+            <div class="role-info" id="role-info">
+                نقش: <span id="player-role"></span>
+            </div>
+            
+            <button class="action-btn main-speech" id="main-speech-btn">
+                صحبت اصلی (40 ثانیه)
+                <div class="timer" id="main-speech-timer"></div>
+            </button>
+            
+            <button class="action-btn challenge" id="challenge-btn">
+                چالش (30 ثانیه)
+                <div class="timer" id="challenge-timer"></div>
+            </button>
+            
+            <button class="action-btn warning-btn" id="warning1-btn">اخطار اول</button>
+            <button class="action-btn warning-btn" id="warning2-btn">اخطار دوم</button>
+            <button class="action-btn warning-btn" id="warning3-btn">اخطار سوم (مرگ)</button>
+            
+            <button class="action-btn kill-btn" id="kill-btn">اعلام مرگ</button>
+            <button class="action-btn revive-btn" id="revive-btn">زنده کردن</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const seatsContainer = document.getElementById('seats-container');
+        const confirmSeatsBtn = document.getElementById('confirm-seats-btn');
+        const resetSeatsBtn = document.getElementById('reset-seats-btn');
+        const nextDayBtn = document.getElementById('next-day-btn');
+        const playerModal = document.getElementById('player-modal');
+        const closeModalBtn = document.getElementById('close-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const playerRoleEl = document.getElementById('player-role');
+        const mainSpeechBtn = document.getElementById('main-speech-btn');
+        const challengeBtn = document.getElementById('challenge-btn');
+        const mainSpeechTimer = document.getElementById('main-speech-timer');
+        const challengeTimer = document.getElementById('challenge-timer');
+        const warning1Btn = document.getElementById('warning1-btn');
+        const warning2Btn = document.getElementById('warning2-btn');
+        const warning3Btn = document.getElementById('warning3-btn');
+        const killBtn = document.getElementById('kill-btn');
+        const reviveBtn = document.getElementById('revive-btn');
+        const centerCards = document.querySelectorAll('.center-card');
+        
+        // Game Data
+        let players = [];
+        let assignedRoles = {};
+        let selectedPlayers = [];
+        let currentPlayerId = null;
+        let seatPositions = [];
+        let usedCenterCards = [];
+        let playerStates = {};
+        let mainSpeechTimers = {};
+        let challengeTimers = {};
+        let warnings = {};
+        
+        // Initialize the game
+        function initGame() {
+            // Load players and roles from localStorage
+            const playersData = localStorage.getItem('mafia_players');
+            const rolesData = localStorage.getItem('mafiaAssignedRoles');
+            
+            if (playersData) {
+                const allPlayers = JSON.parse(playersData);
+                players = allPlayers.filter(player => player.active);
+            }
+            
+            if (rolesData) {
+                assignedRoles = JSON.parse(rolesData);
+            }
+            
+            // Initialize player states
+            players.forEach(player => {
+                playerStates[player.id] = {
+                    mainSpeechUsed: false,
+                    challengeUsed: false,
+                    warnings: 0,
+                    isDead: false,
+                    seatId: null
+                };
+                
+                mainSpeechTimers[player.id] = null;
+                challengeTimers[player.id] = null;
+                warnings[player.id] = 0;
+            });
+            
+            // Create seats around the table
+            createSeats();
+        }
+        
+        // Create seats around the table
+        function createSeats() {
+            seatsContainer.innerHTML = '';
+            selectedPlayers = [];
+            
+            const playerCount = players.length;
+            const radius = 200;
+            const centerX = 50;
+            const centerY = 50;
+            
+            seatPositions = [];
+            
+            for (let i = 0; i < playerCount; i++) {
+                const angle = (i * (360 / playerCount)) * (Math.PI / 180);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+                
+                seatPositions.push({ x, y, angle: angle * (180 / Math.PI) });
+                
+                const seat = document.createElement('div');
+                seat.className = 'seat';
+                seat.style.left = `${x}px`;
+                seat.style.top = `${y}px`;
+                seat.style.transform = `rotate(${angle * (180 / Math.PI)}deg)`;
+                seat.dataset.seatId = i;
+                
+                const select = document.createElement('select');
+                select.className = 'player-select';
+                select.dataset.seatId = i;
+                
+                // Add empty option
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = 'انتخاب بازیکن';
+                select.appendChild(emptyOption);
+                
+                // Add players
+                players.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player.id;
+                    option.textContent = player.name;
+                    select.appendChild(option);
+                });
+                
+                select.addEventListener('change', handlePlayerSelect);
+                
+                const nameDisplay = document.createElement('div');
+                nameDisplay.className = 'player-name';
+                
+                seat.appendChild(select);
+                seat.appendChild(nameDisplay);
+                seatsContainer.appendChild(seat);
+            }
+        }
+        
+        // Handle player selection for seats
+        function handlePlayerSelect(e) {
+            const seatId = parseInt(e.target.dataset.seatId);
+            const playerId = e.target.value ? parseInt(e.target.value) : null;
+            
+            // Remove player from previous seat if they were assigned
+            const previousIndex = selectedPlayers.findIndex(p => p && p.id === playerId);
+            if (previousIndex !== -1) {
+                const prevSeat = document.querySelector(`.seat[data-seat-id="${previousIndex}"]`);
+                if (prevSeat) {
+                    const select = prevSeat.querySelector('.player-select');
+                    select.value = '';
+                    prevSeat.classList.remove('assigned');
+                    prevSeat.querySelector('.player-name').textContent = '';
+                }
+                selectedPlayers[previousIndex] = null;
+            }
+            
+            // Assign player to new seat
+            if (playerId) {
+                const player = players.find(p => p.id === playerId);
+                if (player) {
+                    selectedPlayers[seatId] = player;
+                    const seat = e.target.closest('.seat');
+                    seat.classList.add('assigned');
+                    seat.querySelector('.player-name').textContent = player.name;
+                    
+                    // Store seat ID in player state
+                    playerStates[playerId].seatId = seatId;
+                    
+                    // Add click event to show player modal
+                    seat.addEventListener('click', () => showPlayerModal(playerId));
+                }
+            } else {
+                selectedPlayers[seatId] = null;
+                const seat = e.target.closest('.seat');
+                seat.classList.remove('assigned');
+                seat.querySelector('.player-name').textContent = '';
+            }
+            
+            // Update available options in other selects
+            updateSelectOptions();
+        }
+        
+        // Update available options in select elements
+        function updateSelectOptions() {
+            const selects = document.querySelectorAll('.player-select');
+            const selectedIds = selectedPlayers.filter(p => p).map(p => p.id);
+            
+            selects.forEach(select => {
+                const currentValue = select.value;
+                const seatId = parseInt(select.dataset.seatId);
+                
+                // Skip if this seat has a selected player
+                if (selectedPlayers[seatId]) return;
+                
+                Array.from(select.options).forEach(option => {
+                    if (option.value && option.value !== '') {
+                        option.disabled = selectedIds.includes(parseInt(option.value));
+                    }
+                });
+                
+                // Reset to empty if current selection was removed
+                if (currentValue && !selectedPlayers[seatId]) {
+                    select.value = '';
+                }
+            });
+        }
+        
+        // Confirm seat assignments
+        function confirmSeats() {
+            const allAssigned = selectedPlayers.every(p => p !== null);
+            
+            if (!allAssigned) {
+                alert('لطفاً برای تمام صندلی‌ها بازیکن انتخاب کنید');
+                return;
+            }
+            
+            // Disable all selects
+            const selects = document.querySelectorAll('.player-select');
+            selects.forEach(select => {
+                select.disabled = true;
+            });
+            
+            // Enable next day button
+            nextDayBtn.disabled = false;
+            
+            // Enable seat clicks for player management
+            const seats = document.querySelectorAll('.seat');
+            seats.forEach(seat => {
+                if (seat.classList.contains('assigned')) {
+                    const seatId = parseInt(seat.dataset.seatId);
+                    const player = selectedPlayers[seatId];
+                    seat.addEventListener('click', () => showPlayerModal(player.id));
+                }
+            });
+            
+            confirmSeatsBtn.disabled = true;
+        }
+        
+        // Reset seat assignments
+        function resetSeats() {
+            createSeats();
+            confirmSeatsBtn.disabled = false;
+            nextDayBtn.disabled = true;
+        }
+        
+        // Show player management modal
+        function showPlayerModal(playerId) {
+            const player = players.find(p => p.id === playerId);
+            if (!player) return;
+            
+            currentPlayerId = playerId;
+            const state = playerStates[playerId];
+            const role = assignedRoles[playerId];
+            
+            // Set modal title and role
+            modalTitle.textContent = player.name;
+            playerRoleEl.textContent = role ? `${role.name} (${role.type})` : 'نقش نامشخص';
+            
+            // Update button states
+            mainSpeechBtn.disabled = state.mainSpeechUsed || state.isDead;
+            challengeBtn.disabled = state.challengeUsed || state.isDead;
+            
+            warning1Btn.disabled = warnings[playerId] >= 1 || state.isDead;
+            warning2Btn.disabled = warnings[playerId] >= 2 || state.isDead;
+            warning3Btn.disabled = warnings[playerId] >= 3 || state.isDead;
+            
+            killBtn.disabled = state.isDead;
+            reviveBtn.disabled = !state.isDead;
+            
+            // Show modal
+            playerModal.style.display = 'flex';
+        }
+        
+        // Close player modal
+        function closeModal() {
+            playerModal.style.display = 'none';
+            currentPlayerId = null;
+        }
+        
+        // Handle main speech action
+        function startMainSpeech() {
+            if (!currentPlayerId) return;
+            
+            const playerId = currentPlayerId;
+            const state = playerStates[playerId];
+            
+            if (state.mainSpeechUsed || state.isDead) return;
+            
+            // Start 40 second timer
+            let seconds = 40;
+            mainSpeechTimer.textContent = `زمان باقیمانده: ${seconds} ثانیه`;
+            
+            const timer = setInterval(() => {
+                seconds--;
+                mainSpeechTimer.textContent = `زمان باقیمانده: ${seconds} ثانیه`;
+                
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    mainSpeechTimer.textContent = 'زمان به پایان رسید!';
+                    alert('زمان صحبت اصلی به پایان رسید!');
+                    
+                    // Mark as used
+                    state.mainSpeechUsed = true;
+                    mainSpeechBtn.disabled = true;
+                    
+                    // Update seat color
+                    updateSeatAppearance(playerId);
+                }
+            }, 1000);
+            
+            // Store timer reference
+            mainSpeechTimers[playerId] = timer;
+            
+            // Disable button during speech
+            mainSpeechBtn.disabled = true;
+        }
+        
+        // Handle challenge action
+        function startChallenge() {
+            if (!currentPlayerId) return;
+            
+            const playerId = currentPlayerId;
+            const state = playerStates[playerId];
+            
+            if (state.challengeUsed || state.isDead) return;
+            
+            // Start 30 second timer
+            let seconds = 30;
+            challengeTimer.textContent = `زمان باقیمانده: ${seconds} ثانیه`;
+            
+            const timer = setInterval(() => {
+                seconds--;
+                challengeTimer.textContent = `زمان باقیمانده: ${seconds} ثانیه`;
+                
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    challengeTimer.textContent = 'زمان به پایان رسید!';
+                    alert('زمان چالش به پایان رسید!');
+                    
+                    // Mark as used
+                    state.challengeUsed = true;
+                    challengeBtn.disabled = true;
+                    
+                    // Update seat color
+                    updateSeatAppearance(playerId);
+                }
+            }, 1000);
+            
+            // Store timer reference
+            challengeTimers[playerId] = timer;
+            
+            // Disable button during challenge
+            challengeBtn.disabled = true;
+        }
+        
+        // Add warning to player
+        function addWarning(level) {
+            if (!currentPlayerId) return;
+            
+            const playerId = currentPlayerId;
+            warnings[playerId] = level;
+            
+            if (level >= 3) {
+                // Player is considered dead
+                playerStates[playerId].isDead = true;
+                alert(`${players.find(p => p.id === playerId).name} به دلیل دریافت ۳ اخطار مرده تلقی می‌شود!`);
+            }
+            
+            // Update buttons
+            warning1Btn.disabled = true;
+            warning2Btn.disabled = true;
+            warning3Btn.disabled = true;
+            
+            // Update seat appearance
+            updateSeatAppearance(playerId);
+            
+            closeModal();
+        }
+        
+        // Kill player
+        function killPlayer() {
+            if (!currentPlayerId) return;
+            
+            const playerId = currentPlayerId;
+            playerStates[playerId].isDead = true;
+            
+            // Update seat appearance
+            updateSeatAppearance(playerId);
+            
+            alert(`${players.find(p => p.id === playerId).name} مرده اعلام شد!`);
+            closeModal();
+        }
+        
+        // Revive player
+        function revivePlayer() {
+            if (!currentPlayerId) return;
+            
+            const playerId = currentPlayerId;
+            playerStates[playerId].isDead = false;
+            
+            // Reset warnings
+            warnings[playerId] = 0;
+            
+            // Update seat appearance
+            updateSeatAppearance(playerId);
+            
+            alert(`${players.find(p => p.id === playerId).name} زنده اعلام شد!`);
+            closeModal();
+        }
+        
+        // Update seat appearance based on player state
+        function updateSeatAppearance(playerId) {
+            const state = playerStates[playerId];
+            const seatId = state.seatId;
+            
+            if (seatId === null || seatId === undefined) return;
+            
+            const seat = document.querySelector(`.seat[data-seat-id="${seatId}"]`);
+            if (!seat) return;
+            
+            // Reset classes
+            seat.className = 'seat assigned';
+            
+            if (state.isDead) {
+                seat.classList.add('dead');
+            } else if (warnings[playerId] >= 3) {
+                seat.classList.add('dead');
+            } else if (warnings[playerId] >= 1) {
+                seat.classList.add('danger');
+            } else if (state.mainSpeechUsed || state.challengeUsed) {
+                seat.classList.add('warning');
+            }
+        }
+        
+        // Handle center card selection
+        function selectCenterCard(card) {
+            if (usedCenterCards.includes(card)) {
+                alert('این کارت قبلاً استفاده شده است!');
+                return;
+            }
+            
+            usedCenterCards.push(card);
+            card.classList.add('disabled');
+            
+            alert(`کارت "${card.textContent}" انتخاب شد و غیرفعال گردید.`);
+        }
+        
+        // Go to next day
+        function goToNextDay() {
+            // Save game state
+            const gameState = {
+                players: players,
+                assignedRoles: assignedRoles,
+                playerStates: playerStates,
+                warnings: warnings,
+                usedCenterCards: usedCenterCards.map(card => card.dataset.card),
+                day: 2 // Next day
+            };
+            
+            localStorage.setItem('mafiaGameState', JSON.stringify(gameState));
+            
+            // Redirect to next day (you'll need to create this page)
+            window.location.href = 'day-two.html';
+        }
+        
+        // Event Listeners
+        confirmSeatsBtn.addEventListener('click', confirmSeats);
+        resetSeatsBtn.addEventListener('click', resetSeats);
+        nextDayBtn.addEventListener('click', goToNextDay);
+        closeModalBtn.addEventListener('click', closeModal);
+        
+        mainSpeechBtn.addEventListener('click', startMainSpeech);
+        challengeBtn.addEventListener('click', startChallenge);
+        warning1Btn.addEventListener('click', () => addWarning(1));
+        warning2Btn.addEventListener('click', () => addWarning(2));
+        warning3Btn.addEventListener('click', () => addWarning(3));
+        killBtn.addEventListener('click', killPlayer);
+        reviveBtn.addEventListener('click', revivePlayer);
+        
+        centerCards.forEach(card => {
+            card.addEventListener('click', () => selectCenterCard(card));
+        });
+        
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === playerModal) {
+                closeModal();
+            }
+        });
+        
+        // Initialize the game
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
