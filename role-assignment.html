@@ -242,6 +242,17 @@
             color: white;
         }
         
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
         .btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -378,8 +389,8 @@
         
         <div class="actions">
             <button class="btn btn-primary" id="assign-btn">Assign Roles</button>
-            <button class="btn btn-secondary" id="report-btn">Generate Report</button>
-            <button class="btn btn-secondary" id="day-one-btn">Day One</button>
+            <button class="btn btn-secondary" id="report-btn" disabled>Generate Report</button>
+            <button class="btn btn-secondary" id="day-one-btn" disabled>Day One</button>
             <button class="btn btn-danger" id="reset-btn">Reset All</button>
         </div>
     </div>
@@ -478,11 +489,16 @@
                 return;
             }
             
+            // Check if all players have revealed their roles
+            let allRevealed = true;
+            
             players.forEach(player => {
                 const playerCard = document.createElement('div');
                 playerCard.className = 'player-card';
                 if (assignedRoles[player.id]?.revealed) {
                     playerCard.classList.add('revealed');
+                } else {
+                    allRevealed = false; // If even one player hasn't revealed their role
                 }
                 playerCard.dataset.id = player.id;
                 
@@ -502,8 +518,8 @@
             
             // Update report and day one buttons
             const allRolesAssigned = Object.keys(assignedRoles).length === roles.length && roles.length > 0;
-            reportBtn.disabled = !allRolesAssigned;
-            dayOneBtn.disabled = !allRolesAssigned;
+            reportBtn.disabled = !allRolesAssigned || !allRevealed;
+            dayOneBtn.disabled = !allRolesAssigned || !allRevealed;
         }
         
         // Assign roles randomly to players
